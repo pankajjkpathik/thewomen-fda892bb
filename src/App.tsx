@@ -11,8 +11,22 @@ import Index from "./pages/Index";
 import ShopPage from "./pages/ShopPage";
 import ProductPage from "./pages/ProductPage";
 import NotFound from "./pages/NotFound";
+import AdminLayout from "./pages/admin/AdminLayout";
+import AdminDashboard from "./pages/admin/AdminDashboard";
+import AdminProducts from "./pages/admin/AdminProducts";
+import AdminOrders from "./pages/admin/AdminOrders";
+import AdminCoupons from "./pages/admin/AdminCoupons";
 
 const queryClient = new QueryClient();
+
+const StorefrontLayout = ({ children }: { children: React.ReactNode }) => (
+  <>
+    <Header />
+    <CartDrawer />
+    <main className="min-h-screen">{children}</main>
+    <Footer />
+  </>
+);
 
 const App = () => (
   <QueryClientProvider client={queryClient}>
@@ -21,17 +35,21 @@ const App = () => (
         <Toaster />
         <Sonner />
         <BrowserRouter>
-          <Header />
-          <CartDrawer />
-          <main className="min-h-screen">
-            <Routes>
-              <Route path="/" element={<Index />} />
-              <Route path="/shop" element={<ShopPage />} />
-              <Route path="/product/:id" element={<ProductPage />} />
-              <Route path="*" element={<NotFound />} />
-            </Routes>
-          </main>
-          <Footer />
+          <Routes>
+            {/* Admin routes — no store header/footer */}
+            <Route path="/admin" element={<AdminLayout />}>
+              <Route index element={<AdminDashboard />} />
+              <Route path="products" element={<AdminProducts />} />
+              <Route path="orders" element={<AdminOrders />} />
+              <Route path="coupons" element={<AdminCoupons />} />
+            </Route>
+
+            {/* Storefront routes */}
+            <Route path="/" element={<StorefrontLayout><Index /></StorefrontLayout>} />
+            <Route path="/shop" element={<StorefrontLayout><ShopPage /></StorefrontLayout>} />
+            <Route path="/product/:id" element={<StorefrontLayout><ProductPage /></StorefrontLayout>} />
+            <Route path="*" element={<StorefrontLayout><NotFound /></StorefrontLayout>} />
+          </Routes>
         </BrowserRouter>
       </CartProvider>
     </TooltipProvider>

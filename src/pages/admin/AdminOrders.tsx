@@ -53,7 +53,7 @@ const AdminOrders = () => {
                   </p>
                 </div>
                 <div className="flex items-center gap-3">
-                  <span className={`text-xs px-2 py-1 rounded font-body ${statusColors[order.status] || ""}`}>
+                  <span className={`text-xs px-2 py-1 rounded font-body capitalize ${statusColors[order.status] || ""}`}>
                     {order.status}
                   </span>
                   <Select value={order.status} onValueChange={(v) => handleStatusChange(order.id, v)}>
@@ -83,19 +83,25 @@ const AdminOrders = () => {
                   </span>
                 </div>
                 <div>
-                  <p className="text-xs text-muted-foreground mb-1">Tracking ID</p>
-                  <div className="flex gap-2">
+                  <p className="text-xs text-muted-foreground mb-1">Tracking</p>
+                  <div className="flex flex-col gap-1">
                     <Input
-                      placeholder={order.tracking_id || "Enter tracking ID"}
+                      placeholder={order.tracking_id || "Tracking ID"}
                       value={trackingInputs[order.id] || ""}
                       onChange={(e) => setTrackingInputs((p) => ({ ...p, [order.id]: e.target.value }))}
                       className="text-xs h-8"
                     />
+                    <Input
+                      placeholder={order.tracking_url || "Tracking URL (optional)"}
+                      value={trackingUrls[order.id] || ""}
+                      onChange={(e) => setTrackingUrls((p) => ({ ...p, [order.id]: e.target.value }))}
+                      className="text-xs h-8"
+                    />
                     <button
                       onClick={() => handleTrackingSubmit(order.id)}
-                      className="text-xs px-3 bg-primary text-primary-foreground rounded hover:bg-primary/90"
+                      className="text-xs px-3 py-1 bg-primary text-primary-foreground rounded hover:bg-primary/90"
                     >
-                      Save
+                      Save Tracking
                     </button>
                   </div>
                 </div>

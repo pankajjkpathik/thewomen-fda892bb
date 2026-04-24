@@ -1,10 +1,11 @@
 import { NavLink, useLocation } from "react-router-dom";
-import { LayoutDashboard, Package, ShoppingCart, Tag, ArrowLeft } from "lucide-react";
+import { LayoutDashboard, Package, ShoppingCart, Tag, ArrowLeft, Scissors } from "lucide-react";
 
 const links = [
   { to: "/admin", icon: LayoutDashboard, label: "Dashboard", end: true },
   { to: "/admin/products", icon: Package, label: "Products" },
   { to: "/admin/orders", icon: ShoppingCart, label: "Orders" },
+  { to: "/admin/tailoring", icon: Scissors, label: "Tailoring" },
   { to: "/admin/coupons", icon: Tag, label: "Coupons" },
 ];
 

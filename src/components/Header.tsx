@@ -27,7 +27,7 @@ const Header = () => {
       </div>
 
       <div className="container mx-auto px-4">
-        <div className="flex items-center justify-between h-16 lg:h-20">
+        <div className="flex items-center justify-between h-[125px]">
           {/* Mobile menu */}
           <button
             onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
@@ -42,10 +42,10 @@ const Header = () => {
             <img
               src={twLogo}
               alt="The Women"
-              width={90}
-              height={90}
+              width={115}
+              height={115}
               className="object-contain"
-              style={{ width: 90, height: 90 }}
+              style={{ width: 115, height: 115 }}
               loading="eager"
               decoding="async"
             />

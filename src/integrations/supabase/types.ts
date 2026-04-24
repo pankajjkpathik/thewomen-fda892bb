@@ -132,7 +132,7 @@ export type Database = {
           total_amount: number
           tracking_id: string | null
           updated_at: string
-          user_id: string | null
+          user_id: string
         }
         Insert: {
           billing_address?: string | null
@@ -158,7 +158,7 @@ export type Database = {
           total_amount: number
           tracking_id?: string | null
           updated_at?: string
-          user_id?: string | null
+          user_id: string
         }
         Update: {
           billing_address?: string | null
@@ -184,7 +184,7 @@ export type Database = {
           total_amount?: number
           tracking_id?: string | null
           updated_at?: string
-          user_id?: string | null
+          user_id?: string
         }
         Relationships: []
       }
@@ -286,6 +286,18 @@ export type Database = {
           _user_id: string
         }
         Returns: boolean
+      }
+      validate_coupon: {
+        Args: { _code: string; _order_amount: number }
+        Returns: {
+          code: string
+          discount_amount: number
+          discount_type: string
+          discount_value: number
+          is_valid: boolean
+          message: string
+          min_order_amount: number
+        }[]
       }
     }
     Enums: {

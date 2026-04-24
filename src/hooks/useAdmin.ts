@@ -58,8 +58,10 @@ export const useAdminOrders = () => {
     return error;
   };
 
-  const updateTrackingId = async (id: string, tracking_id: string) => {
-    const { error } = await supabase.from("orders").update({ tracking_id }).eq("id", id);
+  const updateTrackingId = async (id: string, tracking_id: string, tracking_url?: string) => {
+    const updates: { tracking_id: string; tracking_url?: string } = { tracking_id };
+    if (tracking_url !== undefined) updates.tracking_url = tracking_url;
+    const { error } = await supabase.from("orders").update(updates).eq("id", id);
     if (!error) await fetchOrders();
     return error;
   };

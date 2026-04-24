@@ -15,6 +15,7 @@ const statusColors: Record<string, string> = {
 const AdminOrders = () => {
   const { orders, loading, updateOrderStatus, updateTrackingId } = useAdminOrders();
   const [trackingInputs, setTrackingInputs] = useState<Record<string, string>>({});
+  const [trackingUrls, setTrackingUrls] = useState<Record<string, string>>({});
 
   const handleStatusChange = async (id: string, status: string) => {
     const error = await updateOrderStatus(id, status);
@@ -24,10 +25,11 @@ const AdminOrders = () => {
 
   const handleTrackingSubmit = async (id: string) => {
     const tid = trackingInputs[id];
+    const turl = trackingUrls[id];
     if (!tid) return;
-    const error = await updateTrackingId(id, tid);
+    const error = await updateTrackingId(id, tid, turl);
     if (error) toast.error(error.message);
-    else toast.success("Tracking ID updated");
+    else toast.success("Tracking saved");
   };
 
   return (

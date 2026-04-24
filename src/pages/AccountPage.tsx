@@ -7,6 +7,8 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useToast } from "@/hooks/use-toast";
+import OrderTimeline from "@/components/OrderTimeline";
+import SEO from "@/components/SEO";
 
 const statusColor: Record<string, string> = {
   pending: "bg-yellow-100 text-yellow-800",
@@ -48,6 +50,41 @@ const AccountPage = () => {
     });
   }, [user]);
 
+  // Realtime subscription for live order tracking
+  useEffect(() => {
+    if (!user) return;
+    const channel = supabase
+      .channel(`account-orders-${user.id}`)
+      .on(
+        "postgres_changes",
+        { event: "UPDATE", schema: "public", table: "orders", filter: `user_id=eq.${user.id}` },
+        (payload) => {
+          const updated = payload.new as any;
+          setOrders((prev) => {
+            const idx = prev.findIndex((o) => o.id === updated.id);
+            if (idx === -1) return prev;
+            const oldStatus = prev[idx].status;
+            if (oldStatus !== updated.status) {
+              toast({ title: "Order update", description: `Order #${updated.id.slice(0, 8)} is now ${updated.status}.` });
+            }
+            const next = [...prev];
+            next[idx] = { ...prev[idx], ...updated };
+            return next;
+          });
+        },
+      )
+      .on(
+        "postgres_changes",
+        { event: "INSERT", schema: "public", table: "orders", filter: `user_id=eq.${user.id}` },
+        (payload) => {
+          const newOrder = payload.new as any;
+          setOrders((prev) => [{ ...newOrder, order_items: [] }, ...prev]);
+        },
+      )
+      .subscribe();
+    return () => { supabase.removeChannel(channel); };
+  }, [user, toast]);
+
   const saveProfile = async () => {
     if (!user) return;
     setSaving(true);
@@ -63,6 +100,7 @@ const AccountPage = () => {
 
   return (
     <div className="container mx-auto px-4 py-8 lg:py-12 max-w-4xl">
+      <SEO title="My Account | The Women" description="Manage your profile, orders, and tailoring requests." />
       <div className="flex items-center justify-between mb-8">
         <div>
           <h1 className="font-heading text-3xl">My Account</h1>
@@ -101,24 +139,35 @@ const AccountPage = () => {
                   <p className="text-xs text-muted-foreground">{new Date(o.created_at).toLocaleDateString("en-IN", { day: "numeric", month: "short", year: "numeric" })}</p>
                 </div>
                 <div className="text-right">
-                  <span className={`text-xs px-2 py-1 rounded ${statusColor[o.status] || ""}`}>{o.status}</span>
+                  <span className={`text-xs px-2 py-1 rounded capitalize ${statusColor[o.status] || ""}`}>{o.status}</span>
                   <p className="text-xs text-muted-foreground mt-1">Payment: {o.payment_status}</p>
                 </div>
               </div>
-              <div className="border-t border-border pt-3 text-sm space-y-1">
+
+              <OrderTimeline
+                status={o.status}
+                trackingId={o.tracking_id}
+                trackingUrl={o.tracking_url}
+                shippedAt={o.shipped_at}
+                deliveredAt={o.delivered_at}
+                createdAt={o.created_at}
+                paymentStatus={o.payment_status}
+              />
+
+              <div className="pt-3 text-sm space-y-1">
                 {o.order_items?.map((it: any) => (
                   <div key={it.id} className="flex justify-between text-muted-foreground">
                     <span>{it.product_name} {it.size ? `(${it.size})` : ""} × {it.quantity}</span>
                     <span>₹{(Number(it.unit_price) * it.quantity).toLocaleString()}</span>
                   </div>
                 ))}
+                {Number(o.discount_amount) > 0 && (
+                  <div className="flex justify-between text-accent text-xs pt-1">
+                    <span>Coupon ({o.coupon_code})</span>
+                    <span>− ₹{Number(o.discount_amount).toLocaleString()}</span>
+                  </div>
+                )}
               </div>
-              {o.tracking_id && (
-                <div className="border-t border-border mt-3 pt-3 text-sm">
-                  <span className="text-muted-foreground">Tracking ID: </span>
-                  <span className="font-semibold">{o.tracking_id}</span>
-                </div>
-              )}
             </div>
           ))}
         </TabsContent>

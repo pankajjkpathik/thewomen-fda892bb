@@ -1,10 +1,20 @@
+import { useNavigate } from "react-router-dom";
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from "@/components/ui/sheet";
 import { Button } from "@/components/ui/button";
 import { useCart } from "@/context/CartContext";
+import { useAuth } from "@/hooks/useAuth";
 import { Minus, Plus, Trash2 } from "lucide-react";
 
 const CartDrawer = () => {
   const { items, isCartOpen, setIsCartOpen, updateQuantity, removeItem, totalPrice } = useCart();
+  const { user } = useAuth();
+  const navigate = useNavigate();
+
+  const goToCheckout = () => {
+    setIsCartOpen(false);
+    if (!user) navigate("/login?next=/checkout");
+    else navigate("/checkout");
+  };
 
   return (
     <Sheet open={isCartOpen} onOpenChange={setIsCartOpen}>
@@ -66,7 +76,7 @@ const CartDrawer = () => {
                 <span className="text-muted-foreground">Subtotal</span>
                 <span className="font-semibold">₹{totalPrice.toLocaleString()}</span>
               </div>
-              <Button variant="hero" size="lg" className="w-full">
+              <Button variant="hero" size="lg" className="w-full" onClick={goToCheckout}>
                 Checkout — ₹{totalPrice.toLocaleString()}
               </Button>
             </div>

@@ -7,9 +7,9 @@ import categoryCoords from "@/assets/category-coords.jpg";
 
 const categories = [
   { name: "Kurtis", image: categoryKurtis, href: "/shop?category=Kurtis" },
-  { name: "Festive", image: categoryFestive, href: "/shop?category=Festive Collection" },
-  { name: "Ethnic Sets", image: categorySets, href: "/shop?category=Ethnic Sets with Dupatta" },
+  { name: "Ethnic Dresses", image: categoryFestive, href: "/shop?category=Ethnic Dresses" },
   { name: "Co-ords", image: categoryCoords, href: "/shop?category=Co-ord Sets" },
+  { name: "Tailor Made", image: categorySets, href: "/tailor-made" },
 ];
 
 const CategoryGrid = () => (

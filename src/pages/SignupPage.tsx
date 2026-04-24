@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate, useSearchParams } from "react-router-dom";
 import { useAuth } from "@/hooks/useAuth";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -11,18 +11,30 @@ const SignupPage = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
-  const { signUp } = useAuth();
+  const { signUp, signIn } = useAuth();
   const { toast } = useToast();
+  const navigate = useNavigate();
+  const [params] = useSearchParams();
+  const next = params.get("next") || "/";
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
     const { error } = await signUp(email, password, name);
-    setLoading(false);
     if (error) {
+      setLoading(false);
       toast({ title: "Signup failed", description: error.message, variant: "destructive" });
+      return;
+    }
+    // Auto-confirm is enabled, so attempt sign-in immediately.
+    const { error: signInErr } = await signIn(email, password);
+    setLoading(false);
+    if (signInErr) {
+      toast({ title: "Account created", description: "Please sign in." });
+      navigate(`/login${next !== "/" ? `?next=${encodeURIComponent(next)}` : ""}`);
     } else {
-      toast({ title: "Check your email", description: "We sent you a verification link to confirm your account." });
+      toast({ title: "Welcome!", description: "Your account is ready." });
+      navigate(next);
     }
   };
 
@@ -50,7 +62,7 @@ const SignupPage = () => {
             {loading ? "Creating account..." : "Sign Up"}
           </Button>
           <p className="text-center text-sm text-muted-foreground">
-            Already have an account? <Link to="/login" className="text-primary hover:underline">Sign in</Link>
+            Already have an account? <Link to={`/login${next !== "/" ? `?next=${encodeURIComponent(next)}` : ""}`} className="text-primary hover:underline">Sign in</Link>
           </p>
         </form>
       </div>

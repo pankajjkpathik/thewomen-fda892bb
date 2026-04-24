@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useParams, Link } from "react-router-dom";
-import { products } from "@/data/products";
+import { useProduct, useProducts } from "@/hooks/useProducts";
 import { useCart } from "@/context/CartContext";
 import { Button } from "@/components/ui/button";
 import ProductCard from "@/components/ProductCard";
@@ -9,11 +9,16 @@ import { motion } from "framer-motion";
 
 const ProductPage = () => {
   const { id } = useParams();
-  const product = products.find((p) => p.id === id);
+  const { product, loading } = useProduct(id);
+  const { products } = useProducts();
   const { addItem } = useCart();
   const [selectedSize, setSelectedSize] = useState("");
   const [selectedImage, setSelectedImage] = useState(0);
   const [showSizeChart, setShowSizeChart] = useState(false);
+
+  if (loading) {
+    return <div className="container mx-auto px-4 py-20 text-center font-body text-muted-foreground">Loading…</div>;
+  }
 
   if (!product) {
     return (
@@ -31,13 +36,15 @@ const ProductPage = () => {
   const relatedProducts = products.filter((p) => p.category === product.category && p.id !== product.id).slice(0, 4);
 
   const handleAddToCart = () => {
+    if (product.category === "Tailor Made") return; // tailor made uses its own flow
     if (!selectedSize) return;
     addItem(product, selectedSize);
   };
 
+  const isTailorMade = product.category === "Tailor Made";
+
   return (
     <div className="container mx-auto px-4 py-6 lg:py-12">
-      {/* Breadcrumb */}
       <nav className="mb-6 font-body text-xs text-muted-foreground">
         <Link to="/" className="hover:text-foreground">Home</Link>
         <span className="mx-2">/</span>
@@ -47,7 +54,6 @@ const ProductPage = () => {
       </nav>
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-16">
-        {/* Images */}
         <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="space-y-4">
           <div className="relative overflow-hidden bg-cream rounded group">
             <img
@@ -76,7 +82,6 @@ const ProductPage = () => {
           </div>
         </motion.div>
 
-        {/* Details */}
         <motion.div initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: 0.2 }}>
           <p className="text-xs tracking-[0.3em] uppercase text-accent font-body mb-2">{product.category}</p>
           <h1 className="font-heading text-2xl lg:text-3xl mb-4">{product.name}</h1>
@@ -85,119 +90,62 @@ const ProductPage = () => {
             <span className="font-body text-2xl font-semibold">₹{product.price.toLocaleString()}</span>
             {product.originalPrice && (
               <>
-                <span className="font-body text-lg text-muted-foreground line-through">
-                  ₹{product.originalPrice.toLocaleString()}
-                </span>
-                <span className="bg-accent/10 text-accent text-xs font-body font-semibold px-2 py-1 rounded">
-                  {discount}% OFF
-                </span>
+                <span className="font-body text-lg text-muted-foreground line-through">₹{product.originalPrice.toLocaleString()}</span>
+                <span className="bg-accent/10 text-accent text-xs font-body font-semibold px-2 py-1 rounded">{discount}% OFF</span>
               </>
             )}
           </div>
 
           <p className="font-body text-sm text-muted-foreground leading-relaxed mb-6">{product.description}</p>
 
-          {/* Size selection */}
-          <div className="mb-6">
-            <div className="flex items-center justify-between mb-3">
-              <span className="font-body text-sm font-semibold">Select Size</span>
-              <button
-                onClick={() => setShowSizeChart(!showSizeChart)}
-                className="font-body text-xs text-accent underline"
-              >
-                Size Chart
-              </button>
-            </div>
-            <div className="flex gap-2">
-              {product.sizes.map((size) => (
-                <button
-                  key={size}
-                  onClick={() => setSelectedSize(size)}
-                  className={`w-12 h-12 border font-body text-sm transition-all ${
-                    selectedSize === size
-                      ? "border-foreground bg-foreground text-background"
-                      : "border-border hover:border-foreground"
-                  }`}
-                >
-                  {size}
-                </button>
-              ))}
-            </div>
-            {showSizeChart && (
-              <div className="mt-4 p-4 border border-border rounded bg-muted font-body text-xs">
-                <table className="w-full">
-                  <thead><tr className="border-b border-border"><th className="py-2 text-left">Size</th><th>Bust</th><th>Waist</th><th>Hip</th></tr></thead>
-                  <tbody>
-                    <tr className="border-b border-border"><td className="py-2">S</td><td>34"</td><td>28"</td><td>36"</td></tr>
-                    <tr className="border-b border-border"><td className="py-2">M</td><td>36"</td><td>30"</td><td>38"</td></tr>
-                    <tr className="border-b border-border"><td className="py-2">L</td><td>38"</td><td>32"</td><td>40"</td></tr>
-                    <tr className="border-b border-border"><td className="py-2">XL</td><td>40"</td><td>34"</td><td>42"</td></tr>
-                    <tr><td className="py-2">XXL</td><td>42"</td><td>36"</td><td>44"</td></tr>
-                  </tbody>
-                </table>
+          {!isTailorMade && (
+            <div className="mb-6">
+              <div className="flex items-center justify-between mb-3">
+                <span className="font-body text-sm font-semibold">Select Size</span>
+                <button onClick={() => setShowSizeChart(!showSizeChart)} className="font-body text-xs text-accent underline">Size Chart</button>
               </div>
-            )}
-          </div>
+              <div className="flex gap-2 flex-wrap">
+                {product.sizes.map((size) => (
+                  <button
+                    key={size}
+                    onClick={() => setSelectedSize(size)}
+                    className={`min-w-12 h-12 px-3 border font-body text-sm transition-all ${selectedSize === size ? "border-foreground bg-foreground text-background" : "border-border hover:border-foreground"}`}
+                  >
+                    {size}
+                  </button>
+                ))}
+              </div>
+            </div>
+          )}
 
-          {/* Actions */}
           <div className="flex gap-3 mb-8">
-            <Button
-              variant="hero"
-              size="lg"
-              className="flex-1"
-              onClick={handleAddToCart}
-              disabled={!selectedSize}
-            >
-              {selectedSize ? "Add to Bag" : "Select a Size"}
-            </Button>
+            {isTailorMade ? (
+              <Link to={`/tailor-made?product=${product.id}`} className="flex-1">
+                <Button variant="hero" size="lg" className="w-full">Customize & Submit Measurements</Button>
+              </Link>
+            ) : (
+              <Button variant="hero" size="lg" className="flex-1" onClick={handleAddToCart} disabled={!selectedSize}>
+                {selectedSize ? "Add to Bag" : "Select a Size"}
+              </Button>
+            )}
             <button className="w-12 h-12 border border-border flex items-center justify-center hover:bg-muted transition-colors" aria-label="Wishlist">
               <Heart size={20} />
             </button>
           </div>
 
-          {/* Product info */}
           <div className="space-y-4 border-t border-border pt-6">
-            <div className="flex items-center gap-3 font-body text-sm">
-              <Truck size={18} className="text-accent" />
-              <span>Free shipping on orders above ₹1,999</span>
-            </div>
-            <div className="flex items-center gap-3 font-body text-sm">
-              <RotateCcw size={18} className="text-accent" />
-              <span>Easy 7-day returns & exchanges</span>
-            </div>
-            <div className="flex items-center gap-3 font-body text-sm">
-              <Shield size={18} className="text-accent" />
-              <span>100% Authentic & Quality Assured</span>
-            </div>
-          </div>
-
-          {/* Details accordion */}
-          <div className="mt-8 space-y-4">
-            <details className="border-t border-border pt-4">
-              <summary className="font-body text-sm font-semibold cursor-pointer">Product Details</summary>
-              <div className="mt-3 font-body text-sm text-muted-foreground space-y-1">
-                <p>Fabric: {product.fabric}</p>
-                <p>Fit: {product.fit}</p>
-                <p>Occasion: {product.occasion}</p>
-                <p>Colors: {product.colors.join(", ")}</p>
-              </div>
-            </details>
-            <details className="border-t border-border pt-4">
-              <summary className="font-body text-sm font-semibold cursor-pointer">Care Instructions</summary>
-              <p className="mt-3 font-body text-sm text-muted-foreground">{product.careInstructions}</p>
-            </details>
+            <div className="flex items-center gap-3 font-body text-sm"><Truck size={18} className="text-accent" /><span>Free shipping on orders above ₹1,999</span></div>
+            <div className="flex items-center gap-3 font-body text-sm"><RotateCcw size={18} className="text-accent" /><span>Easy 7-day returns & exchanges</span></div>
+            <div className="flex items-center gap-3 font-body text-sm"><Shield size={18} className="text-accent" /><span>100% Authentic & Quality Assured</span></div>
           </div>
         </motion.div>
       </div>
 
-      {/* Related */}
       {relatedProducts.length > 0 && (
         <section className="mt-16 lg:mt-24">
           <h2 className="font-heading text-2xl mb-8 text-center">You May Also Like</h2>
           <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 lg:gap-6">
-            {relatedProducts.map((p, i) => (
-              <ProductCard key={p.id} product={p} index={i} />
-            ))}
+            {relatedProducts.map((p, i) => <ProductCard key={p.id} product={p} index={i} />)}
           </div>
         </section>
       )}

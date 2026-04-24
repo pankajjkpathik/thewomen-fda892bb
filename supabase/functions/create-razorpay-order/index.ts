@@ -30,11 +30,25 @@ Deno.serve(async (req) => {
     const body = await req.json();
     const items = body.items as Array<{ product_id: string; product_name: string; product_image?: string; size?: string; color?: string; quantity: number; unit_price: number }>;
     const shipping = body.shipping;
+    const couponCode: string | null = body.coupon_code || null;
     if (!Array.isArray(items) || items.length === 0) throw new Error("Cart is empty");
 
     const subtotal = items.reduce((s, i) => s + Number(i.unit_price) * Number(i.quantity), 0);
+
+    // Server-side coupon validation
+    let discountAmount = 0;
+    let appliedCoupon: string | null = null;
+    if (couponCode) {
+      const { data: vRows, error: vErr } = await supabase.rpc("validate_coupon", { _code: couponCode, _order_amount: subtotal });
+      const v = (vRows as any[])?.[0];
+      if (!vErr && v?.is_valid) {
+        discountAmount = Number(v.discount_amount) || 0;
+        appliedCoupon = v.code;
+      }
+    }
+
     const shipping_amount = subtotal >= 1999 ? 0 : 99;
-    const total = Math.round((subtotal + shipping_amount) * 100) / 100;
+    const total = Math.max(0, Math.round((subtotal - discountAmount + shipping_amount) * 100) / 100);
     const amountPaise = Math.round(total * 100);
 
     // Create Razorpay order
@@ -47,12 +61,14 @@ Deno.serve(async (req) => {
     const rzpOrder = await rzpRes.json();
     if (!rzpRes.ok) throw new Error(`Razorpay error: ${JSON.stringify(rzpOrder)}`);
 
-    // Persist DB order (pending)
+    // Persist DB order (pending). validate_order_insert trigger will re-check coupon.
     const { data: order, error: orderErr } = await supabase.from("orders").insert({
       user_id: user.id,
       status: "pending",
       total_amount: total,
+      discount_amount: discountAmount,
       shipping_amount,
+      coupon_code: appliedCoupon,
       payment_method: "razorpay",
       payment_status: "pending",
       razorpay_order_id: rzpOrder.id,
@@ -90,6 +106,7 @@ Deno.serve(async (req) => {
       amount: amountPaise,
       currency: "INR",
       key_id: RZP_KEY,
+      discount_amount: discountAmount,
     }), { headers: { ...corsHeaders, "Content-Type": "application/json" } });
   } catch (e: any) {
     console.error("create-razorpay-order error:", e);

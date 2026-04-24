@@ -1,29 +1,29 @@
 import { useState, useMemo } from "react";
 import { useSearchParams } from "react-router-dom";
 import ProductCard from "@/components/ProductCard";
-import { products, categories } from "@/data/products";
+import { useProducts } from "@/hooks/useProducts";
 import { motion } from "framer-motion";
+
+const categoryList = ["Kurtis", "Ethnic Dresses", "Co-ord Sets", "Tailor Made"];
 
 const ShopPage = () => {
   const [searchParams] = useSearchParams();
   const categoryParam = searchParams.get("category");
   const filterParam = searchParams.get("filter");
+  const { products, loading } = useProducts();
 
   const [selectedCategory, setSelectedCategory] = useState(categoryParam || "All");
   const [sortBy, setSortBy] = useState("newest");
 
   const filtered = useMemo(() => {
     let result = [...products];
-
     if (filterParam === "new") result = result.filter((p) => p.isNew);
     if (filterParam === "bestseller") result = result.filter((p) => p.isBestSeller);
     if (selectedCategory !== "All") result = result.filter((p) => p.category === selectedCategory);
-
     if (sortBy === "price-low") result.sort((a, b) => a.price - b.price);
     if (sortBy === "price-high") result.sort((a, b) => b.price - a.price);
-
     return result;
-  }, [selectedCategory, sortBy, filterParam]);
+  }, [products, selectedCategory, sortBy, filterParam]);
 
   const pageTitle = filterParam === "new" ? "New Arrivals" : filterParam === "bestseller" ? "Best Sellers" : selectedCategory !== "All" ? selectedCategory : "All Collections";
 
@@ -35,7 +35,6 @@ const ShopPage = () => {
       </motion.div>
 
       <div className="flex flex-col lg:flex-row gap-8">
-        {/* Sidebar filters */}
         <aside className="lg:w-56 shrink-0">
           <h3 className="font-heading text-sm tracking-widest uppercase mb-4">Categories</h3>
           <div className="flex flex-row lg:flex-col flex-wrap gap-2">
@@ -45,7 +44,7 @@ const ShopPage = () => {
             >
               All
             </button>
-            {categories.slice(0, 5).map((cat) => (
+            {categoryList.map((cat) => (
               <button
                 key={cat}
                 onClick={() => setSelectedCategory(cat)}
@@ -57,7 +56,6 @@ const ShopPage = () => {
           </div>
         </aside>
 
-        {/* Grid */}
         <div className="flex-1">
           <div className="flex justify-end mb-6">
             <select
@@ -70,12 +68,16 @@ const ShopPage = () => {
               <option value="price-high">Price: High to Low</option>
             </select>
           </div>
-          <div className="grid grid-cols-2 lg:grid-cols-3 gap-4 lg:gap-6">
-            {filtered.map((product, i) => (
-              <ProductCard key={product.id} product={product} index={i} />
-            ))}
-          </div>
-          {filtered.length === 0 && (
+          {loading ? (
+            <p className="text-muted-foreground font-body">Loading…</p>
+          ) : (
+            <div className="grid grid-cols-2 lg:grid-cols-3 gap-4 lg:gap-6">
+              {filtered.map((product, i) => (
+                <ProductCard key={product.id} product={product} index={i} />
+              ))}
+            </div>
+          )}
+          {!loading && filtered.length === 0 && (
             <div className="text-center py-20 text-muted-foreground font-body">
               No products found in this category.
             </div>

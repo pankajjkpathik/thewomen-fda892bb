@@ -1,6 +1,6 @@
 import { Link } from "react-router-dom";
 import ProductCard from "./ProductCard";
-import { products } from "@/data/products";
+import { useProducts } from "@/hooks/useProducts";
 import { Button } from "@/components/ui/button";
 
 interface FeaturedProductsProps {
@@ -10,6 +10,7 @@ interface FeaturedProductsProps {
 }
 
 const FeaturedProducts = ({ title, subtitle, filter }: FeaturedProductsProps) => {
+  const { products, loading } = useProducts();
   let filtered = products;
   if (filter === "new") filtered = products.filter((p) => p.isNew);
   if (filter === "bestseller") filtered = products.filter((p) => p.isBestSeller);
@@ -20,11 +21,15 @@ const FeaturedProducts = ({ title, subtitle, filter }: FeaturedProductsProps) =>
         <p className="text-xs tracking-[0.3em] uppercase text-accent font-body mb-2">{subtitle}</p>
         <h2 className="font-heading text-3xl lg:text-4xl">{title}</h2>
       </div>
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 lg:gap-6">
-        {filtered.slice(0, 4).map((product, i) => (
-          <ProductCard key={product.id} product={product} index={i} />
-        ))}
-      </div>
+      {loading ? (
+        <p className="text-center text-muted-foreground font-body">Loading…</p>
+      ) : (
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 lg:gap-6">
+          {filtered.slice(0, 4).map((product, i) => (
+            <ProductCard key={product.id} product={product} index={i} />
+          ))}
+        </div>
+      )}
       <div className="text-center mt-10">
         <Link to="/shop">
           <Button variant="outline-dark" size="lg" className="px-10">

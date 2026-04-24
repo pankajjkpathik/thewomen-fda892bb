@@ -1,7 +1,8 @@
 import { useState } from "react";
-import { Link } from "react-router-dom";
-import { Search, ShoppingBag, Heart, User, Menu, X } from "lucide-react";
+import { Link, useNavigate } from "react-router-dom";
+import { Search, ShoppingBag, User, Menu, X, LogOut } from "lucide-react";
 import { useCart } from "@/context/CartContext";
+import { useAuth } from "@/hooks/useAuth";
 import { motion, AnimatePresence } from "framer-motion";
 import twLogo from "@/assets/tw-logo.avif";
 
@@ -9,14 +10,15 @@ const navLinks = [
   { label: "New Arrivals", href: "/shop?filter=new" },
   { label: "Kurtis", href: "/shop?category=Kurtis" },
   { label: "Ethnic Dresses", href: "/shop?category=Ethnic Dresses" },
-  { label: "Sets", href: "/shop?category=Ethnic Sets with Dupatta" },
   { label: "Co-ords", href: "/shop?category=Co-ord Sets" },
-  { label: "Festive", href: "/shop?category=Festive Collection" },
+  { label: "Tailor Made", href: "/tailor-made" },
   { label: "Best Sellers", href: "/shop?filter=bestseller" },
 ];
 
 const Header = () => {
   const { totalItems, setIsCartOpen } = useCart();
+  const { user, signOut } = useAuth();
+  const navigate = useNavigate();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   return (
@@ -56,12 +58,20 @@ const Header = () => {
             <button className="hidden sm:block text-foreground hover:text-accent transition-colors" aria-label="Search">
               <Search size={20} />
             </button>
-            <button className="hidden sm:block text-foreground hover:text-accent transition-colors" aria-label="Wishlist">
-              <Heart size={20} />
-            </button>
-            <button className="hidden sm:block text-foreground hover:text-accent transition-colors" aria-label="Account">
-              <User size={20} />
-            </button>
+            {user ? (
+              <>
+                <button onClick={() => navigate("/account")} className="hidden sm:block text-foreground hover:text-accent transition-colors" aria-label="Account">
+                  <User size={20} />
+                </button>
+                <button onClick={() => signOut()} className="hidden sm:block text-foreground hover:text-accent transition-colors" aria-label="Sign out">
+                  <LogOut size={20} />
+                </button>
+              </>
+            ) : (
+              <button onClick={() => navigate("/login")} className="hidden sm:block text-foreground hover:text-accent transition-colors" aria-label="Sign in">
+                <User size={20} />
+              </button>
+            )}
             <button
               onClick={() => setIsCartOpen(true)}
               className="relative text-foreground hover:text-accent transition-colors"

@@ -8,6 +8,8 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useToast } from "@/hooks/use-toast";
+import SEO from "@/components/SEO";
+import { Tag, Check, X } from "lucide-react";
 
 declare global {
   interface Window { Razorpay: any }
@@ -24,6 +26,13 @@ const loadRazorpayScript = () =>
     document.body.appendChild(s);
   });
 
+interface AppliedCoupon {
+  code: string;
+  discount_type: string;
+  discount_value: number;
+  discount_amount: number;
+}
+
 const CheckoutPage = () => {
   const navigate = useNavigate();
   const { user, loading: authLoading } = useAuth();
@@ -34,6 +43,10 @@ const CheckoutPage = () => {
   const [shipping, setShipping] = useState({
     name: "", phone: "", address: "", city: "", state: "", pincode: "",
   });
+
+  const [couponCode, setCouponCode] = useState("");
+  const [coupon, setCoupon] = useState<AppliedCoupon | null>(null);
+  const [validating, setValidating] = useState(false);
 
   useEffect(() => {
     if (!authLoading && !user) {
@@ -59,8 +72,52 @@ const CheckoutPage = () => {
     }
   }, [user]);
 
+  // Re-validate coupon when subtotal changes
+  useEffect(() => {
+    if (coupon) {
+      supabase.rpc("validate_coupon", { _code: coupon.code, _order_amount: totalPrice }).then(({ data }) => {
+        const row = (data as any[])?.[0];
+        if (!row?.is_valid) setCoupon(null);
+        else setCoupon({
+          code: row.code,
+          discount_type: row.discount_type,
+          discount_value: Number(row.discount_value),
+          discount_amount: Number(row.discount_amount),
+        });
+      });
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [totalPrice]);
+
+  const applyCoupon = async () => {
+    const code = couponCode.trim().toUpperCase();
+    if (!code) return;
+    setValidating(true);
+    const { data, error } = await supabase.rpc("validate_coupon", { _code: code, _order_amount: totalPrice });
+    setValidating(false);
+    const row = (data as any[])?.[0];
+    if (error || !row?.is_valid) {
+      toast({ title: "Coupon invalid", description: row?.message || error?.message || "Could not apply", variant: "destructive" });
+      setCoupon(null);
+      return;
+    }
+    setCoupon({
+      code: row.code,
+      discount_type: row.discount_type,
+      discount_value: Number(row.discount_value),
+      discount_amount: Number(row.discount_amount),
+    });
+    toast({ title: "Coupon applied", description: `${row.code} — you saved ₹${Number(row.discount_amount).toLocaleString()}` });
+  };
+
+  const removeCoupon = () => {
+    setCoupon(null);
+    setCouponCode("");
+  };
+
   const shippingFee = totalPrice >= 1999 ? 0 : 99;
-  const grandTotal = totalPrice + shippingFee;
+  const discountAmount = coupon?.discount_amount || 0;
+  const grandTotal = Math.max(0, totalPrice - discountAmount + shippingFee);
 
   const handlePay = async () => {
     if (!user) return;
@@ -93,6 +150,7 @@ const CheckoutPage = () => {
           unit_price: i.product.price,
         })),
         shipping,
+        coupon_code: coupon?.code || null,
       },
     });
     if (error || !data?.razorpay_order_id) {
@@ -138,6 +196,7 @@ const CheckoutPage = () => {
 
   return (
     <div className="container mx-auto px-4 py-8 lg:py-12 max-w-5xl">
+      <SEO title="Checkout | The Women" description="Secure checkout for your order at The Women." />
       <h1 className="font-heading text-3xl mb-8">Checkout</h1>
       {items.length === 0 ? (
         <p className="font-body text-muted-foreground">Your bag is empty. <a href="/shop" className="underline">Continue shopping</a>.</p>
@@ -164,15 +223,51 @@ const CheckoutPage = () => {
                 </div>
               ))}
             </div>
+
+            {/* Coupon */}
+            <div className="py-4 border-b border-border">
+              <Label className="font-body text-xs text-muted-foreground flex items-center gap-1 mb-2"><Tag size={12} /> Have a coupon code?</Label>
+              {coupon ? (
+                <div className="flex items-center justify-between bg-accent/10 border border-accent/30 rounded px-3 py-2">
+                  <div className="flex items-center gap-2 text-sm font-body">
+                    <Check size={14} className="text-accent" />
+                    <span className="font-semibold">{coupon.code}</span>
+                    <span className="text-muted-foreground text-xs">
+                      ({coupon.discount_type === "percentage" ? `${coupon.discount_value}% off` : `₹${coupon.discount_value} off`})
+                    </span>
+                  </div>
+                  <button onClick={removeCoupon} className="text-muted-foreground hover:text-destructive" aria-label="Remove coupon">
+                    <X size={16} />
+                  </button>
+                </div>
+              ) : (
+                <div className="flex gap-2">
+                  <Input value={couponCode} onChange={(e) => setCouponCode(e.target.value.toUpperCase())} placeholder="Enter code" className="text-sm" />
+                  <Button variant="outline" size="sm" onClick={applyCoupon} disabled={validating || !couponCode}>
+                    {validating ? "..." : "Apply"}
+                  </Button>
+                </div>
+              )}
+            </div>
+
             <div className="space-y-2 font-body text-sm py-4 border-b border-border">
               <div className="flex justify-between"><span>Subtotal</span><span>₹{totalPrice.toLocaleString()}</span></div>
+              {discountAmount > 0 && (
+                <div className="flex justify-between text-accent">
+                  <span>Coupon ({coupon!.code})</span>
+                  <span>− ₹{discountAmount.toLocaleString()}</span>
+                </div>
+              )}
               <div className="flex justify-between"><span>Shipping</span><span>{shippingFee === 0 ? "FREE" : `₹${shippingFee}`}</span></div>
             </div>
             <div className="flex justify-between font-heading text-lg pt-4">
               <span>Total</span><span>₹{grandTotal.toLocaleString()}</span>
             </div>
+            {discountAmount > 0 && (
+              <p className="text-xs text-accent font-body mt-2 text-right">You save ₹{discountAmount.toLocaleString()}!</p>
+            )}
             <Button variant="hero" size="lg" className="w-full mt-6" onClick={handlePay} disabled={submitting}>
-              {submitting ? "Processing…" : "Pay with Razorpay"}
+              {submitting ? "Processing…" : `Pay ₹${grandTotal.toLocaleString()} with Razorpay`}
             </Button>
             <p className="text-xs text-muted-foreground font-body mt-3 text-center">Test Mode — use Razorpay test cards.</p>
           </div>

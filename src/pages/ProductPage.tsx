@@ -1,11 +1,13 @@
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import { useParams, Link } from "react-router-dom";
-import { useProduct, useProducts } from "@/hooks/useProducts";
+import { useProduct, useProducts, isVariantAvailable, variantKey } from "@/hooks/useProducts";
 import { useCart } from "@/context/CartContext";
 import { Button } from "@/components/ui/button";
 import ProductCard from "@/components/ProductCard";
+import SEO from "@/components/SEO";
 import { Heart, Truck, RotateCcw, Shield } from "lucide-react";
 import { motion } from "framer-motion";
+import { toast } from "sonner";
 
 const ProductPage = () => {
   const { id } = useParams();
@@ -13,8 +15,11 @@ const ProductPage = () => {
   const { products } = useProducts();
   const { addItem } = useCart();
   const [selectedSize, setSelectedSize] = useState("");
+  const [selectedColor, setSelectedColor] = useState("");
   const [selectedImage, setSelectedImage] = useState(0);
-  const [showSizeChart, setShowSizeChart] = useState(false);
+
+  const variantStock = product?.variantStock || {};
+  const tracksVariants = useMemo(() => Object.keys(variantStock).length > 0, [variantStock]);
 
   if (loading) {
     return <div className="container mx-auto px-4 py-20 text-center font-body text-muted-foreground">Loading…</div>;
@@ -34,17 +39,58 @@ const ProductPage = () => {
     : 0;
 
   const relatedProducts = products.filter((p) => p.category === product.category && p.id !== product.id).slice(0, 4);
+  const isTailorMade = product.category === "Tailor Made";
+
+  const variantAvailable = isVariantAvailable(product, selectedSize, selectedColor || undefined);
+  const sizeUnavailable = (size: string) => {
+    if (!tracksVariants) return false;
+    if (selectedColor) return !isVariantAvailable(product, size, selectedColor);
+    // any color in stock?
+    if (product.colors.length === 0) return !isVariantAvailable(product, size);
+    return !product.colors.some((c) => isVariantAvailable(product, size, c));
+  };
 
   const handleAddToCart = () => {
-    if (product.category === "Tailor Made") return; // tailor made uses its own flow
-    if (!selectedSize) return;
+    if (isTailorMade) return;
+    if (!selectedSize) {
+      toast.error("Please select a size");
+      return;
+    }
+    if (product.colors.length > 0 && !selectedColor && tracksVariants) {
+      toast.error("Please select a color");
+      return;
+    }
+    if (!variantAvailable) {
+      toast.error("This variant is out of stock");
+      return;
+    }
     addItem(product, selectedSize);
   };
 
-  const isTailorMade = product.category === "Tailor Made";
+  const seoTitle = product.seoTitle || `${product.name} | The Women`;
+  const seoDesc = product.seoDescription || product.description?.slice(0, 160) || `Shop ${product.name} from The Women — premium Indian ethnic wear.`;
+  const canonical = `${window.location.origin}/product/${product.id}`;
+  const productJsonLd = {
+    "@context": "https://schema.org",
+    "@type": "Product",
+    name: product.name,
+    description: product.description,
+    image: product.images,
+    sku: product.id,
+    brand: { "@type": "Brand", name: "The Women" },
+    offers: {
+      "@type": "Offer",
+      url: canonical,
+      priceCurrency: "INR",
+      price: product.price,
+      availability: product.inStock ? "https://schema.org/InStock" : "https://schema.org/OutOfStock",
+    },
+  };
 
   return (
     <div className="container mx-auto px-4 py-6 lg:py-12">
+      <SEO title={seoTitle} description={seoDesc} canonical={canonical} image={product.images[0]} type="product" jsonLd={productJsonLd} />
+
       <nav className="mb-6 font-body text-xs text-muted-foreground">
         <Link to="/" className="hover:text-foreground">Home</Link>
         <span className="mx-2">/</span>
@@ -98,23 +144,49 @@ const ProductPage = () => {
 
           <p className="font-body text-sm text-muted-foreground leading-relaxed mb-6">{product.description}</p>
 
+          {!isTailorMade && product.colors.length > 0 && (
+            <div className="mb-6">
+              <span className="font-body text-sm font-semibold block mb-3">Color {selectedColor && <span className="text-muted-foreground font-normal">— {selectedColor}</span>}</span>
+              <div className="flex gap-2 flex-wrap">
+                {product.colors.map((color) => {
+                  const colorOut = tracksVariants && !product.sizes.some((s) => isVariantAvailable(product, s, color));
+                  return (
+                    <button
+                      key={color}
+                      onClick={() => setSelectedColor(color)}
+                      disabled={colorOut}
+                      className={`px-3 h-10 border font-body text-xs transition-all ${selectedColor === color ? "border-foreground bg-foreground text-background" : "border-border hover:border-foreground"} ${colorOut ? "opacity-40 line-through cursor-not-allowed" : ""}`}
+                    >
+                      {color}
+                    </button>
+                  );
+                })}
+              </div>
+            </div>
+          )}
+
           {!isTailorMade && (
             <div className="mb-6">
-              <div className="flex items-center justify-between mb-3">
-                <span className="font-body text-sm font-semibold">Select Size</span>
-                <button onClick={() => setShowSizeChart(!showSizeChart)} className="font-body text-xs text-accent underline">Size Chart</button>
-              </div>
+              <span className="font-body text-sm font-semibold block mb-3">Select Size</span>
               <div className="flex gap-2 flex-wrap">
-                {product.sizes.map((size) => (
-                  <button
-                    key={size}
-                    onClick={() => setSelectedSize(size)}
-                    className={`min-w-12 h-12 px-3 border font-body text-sm transition-all ${selectedSize === size ? "border-foreground bg-foreground text-background" : "border-border hover:border-foreground"}`}
-                  >
-                    {size}
-                  </button>
-                ))}
+                {product.sizes.map((size) => {
+                  const out = sizeUnavailable(size);
+                  return (
+                    <button
+                      key={size}
+                      onClick={() => !out && setSelectedSize(size)}
+                      disabled={out}
+                      className={`min-w-12 h-12 px-3 border font-body text-sm transition-all ${selectedSize === size ? "border-foreground bg-foreground text-background" : "border-border hover:border-foreground"} ${out ? "opacity-40 line-through cursor-not-allowed" : ""}`}
+                      title={out ? "Out of stock" : ""}
+                    >
+                      {size}
+                    </button>
+                  );
+                })}
               </div>
+              {selectedSize && !variantAvailable && (
+                <p className="text-xs text-destructive font-body mt-2">This selection is out of stock.</p>
+              )}
             </div>
           )}
 
@@ -124,8 +196,14 @@ const ProductPage = () => {
                 <Button variant="hero" size="lg" className="w-full">Customize & Submit Measurements</Button>
               </Link>
             ) : (
-              <Button variant="hero" size="lg" className="flex-1" onClick={handleAddToCart} disabled={!selectedSize}>
-                {selectedSize ? "Add to Bag" : "Select a Size"}
+              <Button
+                variant="hero"
+                size="lg"
+                className="flex-1"
+                onClick={handleAddToCart}
+                disabled={!selectedSize || !variantAvailable || !product.inStock}
+              >
+                {!product.inStock ? "Out of Stock" : !selectedSize ? "Select a Size" : !variantAvailable ? "Out of Stock" : "Add to Bag"}
               </Button>
             )}
             <button className="w-12 h-12 border border-border flex items-center justify-center hover:bg-muted transition-colors" aria-label="Wishlist">

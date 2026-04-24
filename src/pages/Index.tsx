@@ -2,11 +2,24 @@ import HeroBanner from "@/components/HeroBanner";
 import CategoryGrid from "@/components/CategoryGrid";
 import FeaturedProducts from "@/components/FeaturedProducts";
 import Testimonials from "@/components/Testimonials";
+import SEO from "@/components/SEO";
 import { Button } from "@/components/ui/button";
 import { motion } from "framer-motion";
 
 const Index = () => (
   <>
+    <SEO
+      title="The Women | Premium Indian Ethnic Wear"
+      description="Shop kurtis, ethnic dresses, co-ord sets and tailor-made pieces from The Women — premium ethnic wear for the modern Indian woman."
+      canonical={`${window.location.origin}/`}
+      jsonLd={{
+        "@context": "https://schema.org",
+        "@type": "Organization",
+        name: "The Women",
+        url: window.location.origin,
+        logo: `${window.location.origin}/placeholder.svg`,
+      }}
+    />
     <HeroBanner />
     <CategoryGrid />
     <FeaturedProducts title="New Arrivals" subtitle="Just Dropped" filter="new" />

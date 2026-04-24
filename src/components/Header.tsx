@@ -3,6 +3,7 @@ import { Link } from "react-router-dom";
 import { Search, ShoppingBag, Heart, User, Menu, X } from "lucide-react";
 import { useCart } from "@/context/CartContext";
 import { motion, AnimatePresence } from "framer-motion";
+import twLogo from "@/assets/tw-logo.avif";
 
 const navLinks = [
   { label: "New Arrivals", href: "/shop?filter=new" },
@@ -37,8 +38,14 @@ const Header = () => {
           </button>
 
           {/* Logo */}
-          <Link to="/" className="font-heading text-2xl lg:text-3xl tracking-wide text-foreground">
-            THE WOMEN
+          <Link to="/" aria-label="The Women — Home" className="flex items-center">
+            <img
+              src={twLogo}
+              alt="The Women"
+              className="h-10 lg:h-14 w-auto object-contain"
+              loading="eager"
+              decoding="async"
+            />
           </Link>
 
           {/* Icons */}

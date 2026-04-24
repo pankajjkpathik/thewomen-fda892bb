@@ -132,7 +132,7 @@ export type Database = {
           total_amount: number
           tracking_id: string | null
           updated_at: string
-          user_id: string | null
+          user_id: string
         }
         Insert: {
           billing_address?: string | null
@@ -158,7 +158,7 @@ export type Database = {
           total_amount: number
           tracking_id?: string | null
           updated_at?: string
-          user_id?: string | null
+          user_id: string
         }
         Update: {
           billing_address?: string | null
@@ -184,7 +184,7 @@ export type Database = {
           total_amount?: number
           tracking_id?: string | null
           updated_at?: string
-          user_id?: string | null
+          user_id?: string
         }
         Relationships: []
       }

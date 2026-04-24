@@ -1,6 +1,7 @@
 import { useState, useMemo } from "react";
 import { useSearchParams } from "react-router-dom";
 import ProductCard from "@/components/ProductCard";
+import SEO from "@/components/SEO";
 import { useProducts } from "@/hooks/useProducts";
 import { motion } from "framer-motion";
 
@@ -27,8 +28,15 @@ const ShopPage = () => {
 
   const pageTitle = filterParam === "new" ? "New Arrivals" : filterParam === "bestseller" ? "Best Sellers" : selectedCategory !== "All" ? selectedCategory : "All Collections";
 
+  const seoTitle = `${pageTitle} | The Women`;
+  const seoDescription = selectedCategory !== "All"
+    ? `Shop ${selectedCategory.toLowerCase()} from The Women — premium Indian ethnic wear hand-picked for the modern woman.`
+    : `Discover The Women's curated edit of kurtis, ethnic dresses, co-ord sets and tailor made pieces.`;
+  const canonical = `${window.location.origin}/shop${selectedCategory !== "All" ? `?category=${encodeURIComponent(selectedCategory)}` : ""}`;
+
   return (
     <div className="container mx-auto px-4 py-8 lg:py-12">
+      <SEO title={seoTitle} description={seoDescription} canonical={canonical} />
       <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="mb-8">
         <h1 className="font-heading text-3xl lg:text-4xl mb-2">{pageTitle}</h1>
         <p className="font-body text-sm text-muted-foreground">{filtered.length} products</p>

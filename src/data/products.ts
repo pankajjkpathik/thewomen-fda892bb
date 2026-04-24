@@ -25,6 +25,10 @@ export interface Product {
   isNew?: boolean;
   isBestSeller?: boolean;
   inStock: boolean;
+  variantStock?: Record<string, number>;
+  stockQuantity?: number;
+  seoTitle?: string;
+  seoDescription?: string;
 }
 
 export const products: Product[] = [

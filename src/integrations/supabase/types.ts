@@ -212,6 +212,7 @@ export type Database = {
           category: string
           colors: string[] | null
           created_at: string
+          default_image_index: number
           description: string | null
           fabric: string | null
           fit: string | null
@@ -224,16 +225,20 @@ export type Database = {
           occasion: string | null
           original_price: number | null
           price: number
+          seo_description: string | null
+          seo_title: string | null
           sizes: string[] | null
           slug: string
           stock_quantity: number | null
           updated_at: string
+          variant_stock: Json
         }
         Insert: {
           care_instructions?: string | null
           category: string
           colors?: string[] | null
           created_at?: string
+          default_image_index?: number
           description?: string | null
           fabric?: string | null
           fit?: string | null
@@ -246,16 +251,20 @@ export type Database = {
           occasion?: string | null
           original_price?: number | null
           price: number
+          seo_description?: string | null
+          seo_title?: string | null
           sizes?: string[] | null
           slug: string
           stock_quantity?: number | null
           updated_at?: string
+          variant_stock?: Json
         }
         Update: {
           care_instructions?: string | null
           category?: string
           colors?: string[] | null
           created_at?: string
+          default_image_index?: number
           description?: string | null
           fabric?: string | null
           fit?: string | null
@@ -268,10 +277,13 @@ export type Database = {
           occasion?: string | null
           original_price?: number | null
           price?: number
+          seo_description?: string | null
+          seo_title?: string | null
           sizes?: string[] | null
           slug?: string
           stock_quantity?: number | null
           updated_at?: string
+          variant_stock?: Json
         }
         Relationships: []
       }

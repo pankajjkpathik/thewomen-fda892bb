@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+  <url><loc>https://thewomen.lovable.app/</loc><changefreq>weekly</changefreq><priority>1.0</priority></url>
+  <url><loc>https://thewomen.lovable.app/shop</loc><changefreq>daily</changefreq><priority>0.9</priority></url>
+  <url><loc>https://thewomen.lovable.app/shop?category=Kurtis</loc><changefreq>weekly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://thewomen.lovable.app/shop?category=Ethnic%20Dresses</loc><changefreq>weekly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://thewomen.lovable.app/shop?category=Co-ord%20Sets</loc><changefreq>weekly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://thewomen.lovable.app/tailor-made</loc><changefreq>weekly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://thewomen.lovable.app/shop?filter=new</loc><changefreq>daily</changefreq><priority>0.7</priority></url>
+  <url><loc>https://thewomen.lovable.app/shop?filter=bestseller</loc><changefreq>daily</changefreq><priority>0.7</priority></url>
+</urlset>

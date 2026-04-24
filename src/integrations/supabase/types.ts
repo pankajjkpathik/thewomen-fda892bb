@@ -117,10 +117,15 @@ export type Database = {
           billing_state: string | null
           coupon_code: string | null
           created_at: string
+          delivered_at: string | null
           discount_amount: number | null
           id: string
           payment_method: string | null
           payment_status: string | null
+          razorpay_order_id: string | null
+          razorpay_payment_id: string | null
+          razorpay_signature: string | null
+          shipped_at: string | null
           shipping_address: string | null
           shipping_amount: number | null
           shipping_city: string | null
@@ -131,6 +136,7 @@ export type Database = {
           status: string
           total_amount: number
           tracking_id: string | null
+          tracking_url: string | null
           updated_at: string
           user_id: string
         }
@@ -143,10 +149,15 @@ export type Database = {
           billing_state?: string | null
           coupon_code?: string | null
           created_at?: string
+          delivered_at?: string | null
           discount_amount?: number | null
           id?: string
           payment_method?: string | null
           payment_status?: string | null
+          razorpay_order_id?: string | null
+          razorpay_payment_id?: string | null
+          razorpay_signature?: string | null
+          shipped_at?: string | null
           shipping_address?: string | null
           shipping_amount?: number | null
           shipping_city?: string | null
@@ -157,6 +168,7 @@ export type Database = {
           status?: string
           total_amount: number
           tracking_id?: string | null
+          tracking_url?: string | null
           updated_at?: string
           user_id: string
         }
@@ -169,10 +181,15 @@ export type Database = {
           billing_state?: string | null
           coupon_code?: string | null
           created_at?: string
+          delivered_at?: string | null
           discount_amount?: number | null
           id?: string
           payment_method?: string | null
           payment_status?: string | null
+          razorpay_order_id?: string | null
+          razorpay_payment_id?: string | null
+          razorpay_signature?: string | null
+          shipped_at?: string | null
           shipping_address?: string | null
           shipping_amount?: number | null
           shipping_city?: string | null
@@ -183,6 +200,7 @@ export type Database = {
           status?: string
           total_amount?: number
           tracking_id?: string | null
+          tracking_url?: string | null
           updated_at?: string
           user_id?: string
         }
@@ -254,6 +272,117 @@ export type Database = {
           slug?: string
           stock_quantity?: number | null
           updated_at?: string
+        }
+        Relationships: []
+      }
+      profiles: {
+        Row: {
+          created_at: string
+          default_address: string | null
+          default_city: string | null
+          default_pincode: string | null
+          default_state: string | null
+          full_name: string | null
+          id: string
+          phone: string | null
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          default_address?: string | null
+          default_city?: string | null
+          default_pincode?: string | null
+          default_state?: string | null
+          full_name?: string | null
+          id?: string
+          phone?: string | null
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          default_address?: string | null
+          default_city?: string | null
+          default_pincode?: string | null
+          default_state?: string | null
+          full_name?: string | null
+          id?: string
+          phone?: string | null
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      tailoring_requests: {
+        Row: {
+          admin_notes: string | null
+          bottom_length: number | null
+          bust: number | null
+          color_preference: string | null
+          contact_email: string | null
+          contact_phone: string | null
+          created_at: string
+          design_name: string
+          fabric_preference: string | null
+          hips: number | null
+          id: string
+          kurti_length: number | null
+          notes: string | null
+          product_id: string | null
+          quoted_price: number | null
+          shoulder: number | null
+          sleeve_length: number | null
+          status: string
+          updated_at: string
+          user_id: string
+          waist: number | null
+        }
+        Insert: {
+          admin_notes?: string | null
+          bottom_length?: number | null
+          bust?: number | null
+          color_preference?: string | null
+          contact_email?: string | null
+          contact_phone?: string | null
+          created_at?: string
+          design_name: string
+          fabric_preference?: string | null
+          hips?: number | null
+          id?: string
+          kurti_length?: number | null
+          notes?: string | null
+          product_id?: string | null
+          quoted_price?: number | null
+          shoulder?: number | null
+          sleeve_length?: number | null
+          status?: string
+          updated_at?: string
+          user_id: string
+          waist?: number | null
+        }
+        Update: {
+          admin_notes?: string | null
+          bottom_length?: number | null
+          bust?: number | null
+          color_preference?: string | null
+          contact_email?: string | null
+          contact_phone?: string | null
+          created_at?: string
+          design_name?: string
+          fabric_preference?: string | null
+          hips?: number | null
+          id?: string
+          kurti_length?: number | null
+          notes?: string | null
+          product_id?: string | null
+          quoted_price?: number | null
+          shoulder?: number | null
+          sleeve_length?: number | null
+          status?: string
+          updated_at?: string
+          user_id?: string
+          waist?: number | null
         }
         Relationships: []
       }

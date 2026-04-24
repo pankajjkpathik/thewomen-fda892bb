@@ -16,12 +16,16 @@ import LoginPage from "./pages/LoginPage";
 import SignupPage from "./pages/SignupPage";
 import ForgotPasswordPage from "./pages/ForgotPasswordPage";
 import ResetPasswordPage from "./pages/ResetPasswordPage";
+import CheckoutPage from "./pages/CheckoutPage";
+import AccountPage from "./pages/AccountPage";
+import TailorMadePage from "./pages/TailorMadePage";
 import NotFound from "./pages/NotFound";
 import AdminLayout from "./pages/admin/AdminLayout";
 import AdminDashboard from "./pages/admin/AdminDashboard";
 import AdminProducts from "./pages/admin/AdminProducts";
 import AdminOrders from "./pages/admin/AdminOrders";
 import AdminCoupons from "./pages/admin/AdminCoupons";
+import AdminTailoring from "./pages/admin/AdminTailoring";
 
 const queryClient = new QueryClient();
 
@@ -43,11 +47,12 @@ const App = () => (
           <Sonner />
           <BrowserRouter>
             <Routes>
-              {/* Admin routes — protected */}
+              {/* Admin routes — protected, only accessible by URL */}
               <Route path="/admin" element={<ProtectedAdminRoute><AdminLayout /></ProtectedAdminRoute>}>
                 <Route index element={<AdminDashboard />} />
                 <Route path="products" element={<AdminProducts />} />
                 <Route path="orders" element={<AdminOrders />} />
+                <Route path="tailoring" element={<AdminTailoring />} />
                 <Route path="coupons" element={<AdminCoupons />} />
               </Route>
 
@@ -61,6 +66,9 @@ const App = () => (
               <Route path="/" element={<StorefrontLayout><Index /></StorefrontLayout>} />
               <Route path="/shop" element={<StorefrontLayout><ShopPage /></StorefrontLayout>} />
               <Route path="/product/:id" element={<StorefrontLayout><ProductPage /></StorefrontLayout>} />
+              <Route path="/tailor-made" element={<StorefrontLayout><TailorMadePage /></StorefrontLayout>} />
+              <Route path="/checkout" element={<StorefrontLayout><CheckoutPage /></StorefrontLayout>} />
+              <Route path="/account" element={<StorefrontLayout><AccountPage /></StorefrontLayout>} />
               <Route path="*" element={<StorefrontLayout><NotFound /></StorefrontLayout>} />
             </Routes>
           </BrowserRouter>

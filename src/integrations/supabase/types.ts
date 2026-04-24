@@ -287,6 +287,18 @@ export type Database = {
         }
         Returns: boolean
       }
+      validate_coupon: {
+        Args: { _code: string; _order_amount: number }
+        Returns: {
+          code: string
+          discount_amount: number
+          discount_type: string
+          discount_value: number
+          is_valid: boolean
+          message: string
+          min_order_amount: number
+        }[]
+      }
     }
     Enums: {
       app_role: "admin" | "moderator" | "user"

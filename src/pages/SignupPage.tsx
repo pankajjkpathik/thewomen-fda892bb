@@ -62,7 +62,7 @@ const SignupPage = () => {
             {loading ? "Creating account..." : "Sign Up"}
           </Button>
           <p className="text-center text-sm text-muted-foreground">
-            Already have an account? <Link to="/login" className="text-primary hover:underline">Sign in</Link>
+            Already have an account? <Link to={`/login${next !== "/" ? `?next=${encodeURIComponent(next)}` : ""}`} className="text-primary hover:underline">Sign in</Link>
           </p>
         </form>
       </div>

@@ -42,7 +42,10 @@ const Header = () => {
             <img
               src={twLogo}
               alt="The Women"
-              className="h-10 lg:h-14 w-auto object-contain"
+              width={90}
+              height={90}
+              className="object-contain"
+              style={{ width: 90, height: 90 }}
               loading="eager"
               decoding="async"
             />

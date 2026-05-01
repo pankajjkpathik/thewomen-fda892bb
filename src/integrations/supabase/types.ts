@@ -535,6 +535,11 @@ export type Database = {
           created_at: string
           email: string
           full_name: string
+          last_address: string
+          last_city: string
+          last_order_at: string
+          last_pincode: string
+          last_state: string
           order_count: number
           phone: string
           total_spent: number

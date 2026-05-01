@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { Link, useNavigate, useSearchParams } from "react-router-dom";
+import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -9,9 +10,10 @@ import { useToast } from "@/hooks/use-toast";
 const SignupPage = () => {
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
+  const [phone, setPhone] = useState("");
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
-  const { signUp, signIn } = useAuth();
+  const { signIn } = useAuth();
   const { toast } = useToast();
   const navigate = useNavigate();
   const [params] = useSearchParams();
@@ -19,14 +21,25 @@ const SignupPage = () => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    const phoneTrimmed = phone.trim();
+    if (!/^[+]?[\d\s-]{7,15}$/.test(phoneTrimmed)) {
+      toast({ title: "Invalid phone", description: "Please enter a valid phone number.", variant: "destructive" });
+      return;
+    }
     setLoading(true);
-    const { error } = await signUp(email, password, name);
+    const { error } = await supabase.auth.signUp({
+      email,
+      password,
+      options: {
+        data: { full_name: name, phone: phoneTrimmed },
+        emailRedirectTo: window.location.origin,
+      },
+    });
     if (error) {
       setLoading(false);
       toast({ title: "Signup failed", description: error.message, variant: "destructive" });
       return;
     }
-    // Auto-confirm is enabled, so attempt sign-in immediately.
     const { error: signInErr } = await signIn(email, password);
     setLoading(false);
     if (signInErr) {
@@ -53,6 +66,10 @@ const SignupPage = () => {
           <div className="space-y-2">
             <Label htmlFor="email">Email</Label>
             <Input id="email" type="email" value={email} onChange={e => setEmail(e.target.value)} required placeholder="you@example.com" />
+          </div>
+          <div className="space-y-2">
+            <Label htmlFor="phone">Phone Number</Label>
+            <Input id="phone" type="tel" value={phone} onChange={e => setPhone(e.target.value)} required placeholder="+91 98765 43210" />
           </div>
           <div className="space-y-2">
             <Label htmlFor="password">Password</Label>

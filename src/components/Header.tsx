@@ -24,7 +24,7 @@ const Header = () => {
   return (
     <header className="sticky top-0 z-50 bg-background/95 backdrop-blur-sm border-b border-border">
       {/* Announcement bar */}
-      <div className="bg-primary text-primary-foreground text-center py-2 text-xs tracking-widest font-body uppercase">
+      <div className="bg-brand-dark text-brand-pink text-center py-2 text-xs tracking-widest font-body uppercase">
         Free Shipping on Orders Above ₹1,999 | Use Code: THEWOMEN20
       </div>
 

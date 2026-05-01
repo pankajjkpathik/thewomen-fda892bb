@@ -19,7 +19,7 @@ const statusColor: Record<string, string> = {
 };
 
 const AccountPage = () => {
-  const { user, loading: authLoading, signOut } = useAuth();
+  const { user, loading: authLoading, signOut, isAdmin } = useAuth();
   const navigate = useNavigate();
   const [params] = useSearchParams();
   const { toast } = useToast();
@@ -106,7 +106,12 @@ const AccountPage = () => {
           <h1 className="font-heading text-3xl">My Account</h1>
           <p className="font-body text-sm text-muted-foreground">{user.email}</p>
         </div>
-        <Button variant="outline" onClick={() => signOut().then(() => navigate("/"))}>Sign out</Button>
+        <div className="flex gap-2">
+          {isAdmin && (
+            <Button variant="hero" onClick={() => navigate("/admin")}>Go to Admin</Button>
+          )}
+          <Button variant="outline" onClick={() => signOut().then(() => navigate("/"))}>Sign out</Button>
+        </div>
       </div>
 
       <Tabs defaultValue={defaultTab}>

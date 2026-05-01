@@ -53,6 +53,69 @@ export type Database = {
         }
         Relationships: []
       }
+      invoice_settings: {
+        Row: {
+          address_line1: string | null
+          address_line2: string | null
+          business_name: string | null
+          city: string | null
+          contact_email: string | null
+          contact_phone: string | null
+          country: string | null
+          footer_note: string | null
+          gstin: string | null
+          id: string
+          invoice_prefix: string | null
+          legal_name: string | null
+          next_invoice_number: number | null
+          pincode: string | null
+          state: string | null
+          tax_percentage: number | null
+          terms_and_conditions: string | null
+          updated_at: string
+        }
+        Insert: {
+          address_line1?: string | null
+          address_line2?: string | null
+          business_name?: string | null
+          city?: string | null
+          contact_email?: string | null
+          contact_phone?: string | null
+          country?: string | null
+          footer_note?: string | null
+          gstin?: string | null
+          id?: string
+          invoice_prefix?: string | null
+          legal_name?: string | null
+          next_invoice_number?: number | null
+          pincode?: string | null
+          state?: string | null
+          tax_percentage?: number | null
+          terms_and_conditions?: string | null
+          updated_at?: string
+        }
+        Update: {
+          address_line1?: string | null
+          address_line2?: string | null
+          business_name?: string | null
+          city?: string | null
+          contact_email?: string | null
+          contact_phone?: string | null
+          country?: string | null
+          footer_note?: string | null
+          gstin?: string | null
+          id?: string
+          invoice_prefix?: string | null
+          legal_name?: string | null
+          next_invoice_number?: number | null
+          pincode?: string | null
+          state?: string | null
+          tax_percentage?: number | null
+          terms_and_conditions?: string | null
+          updated_at?: string
+        }
+        Relationships: []
+      }
       order_items: {
         Row: {
           color: string | null
@@ -203,6 +266,48 @@ export type Database = {
           tracking_url?: string | null
           updated_at?: string
           user_id?: string
+        }
+        Relationships: []
+      }
+      payment_settings: {
+        Row: {
+          bank_account_holder: string | null
+          bank_account_number: string | null
+          bank_ifsc: string | null
+          bank_name: string | null
+          id: string
+          notes: string | null
+          pan_number: string | null
+          razorpay_key_id: string | null
+          razorpay_mode: string | null
+          updated_at: string
+          upi_id: string | null
+        }
+        Insert: {
+          bank_account_holder?: string | null
+          bank_account_number?: string | null
+          bank_ifsc?: string | null
+          bank_name?: string | null
+          id?: string
+          notes?: string | null
+          pan_number?: string | null
+          razorpay_key_id?: string | null
+          razorpay_mode?: string | null
+          updated_at?: string
+          upi_id?: string | null
+        }
+        Update: {
+          bank_account_holder?: string | null
+          bank_account_number?: string | null
+          bank_ifsc?: string | null
+          bank_name?: string | null
+          id?: string
+          notes?: string | null
+          pan_number?: string | null
+          razorpay_key_id?: string | null
+          razorpay_mode?: string | null
+          updated_at?: string
+          upi_id?: string | null
         }
         Relationships: []
       }

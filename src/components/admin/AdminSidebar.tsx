@@ -1,5 +1,5 @@
 import { NavLink, useLocation } from "react-router-dom";
-import { LayoutDashboard, Package, ShoppingCart, Tag, ArrowLeft, Scissors, CreditCard, FileText, Users } from "lucide-react";
+import { LayoutDashboard, Package, ShoppingCart, Tag, ArrowLeft, Scissors, CreditCard, FileText, Users, Truck } from "lucide-react";
 
 const links = [
   { to: "/admin", icon: LayoutDashboard, label: "Dashboard", end: true },
@@ -8,6 +8,7 @@ const links = [
   { to: "/admin/customers", icon: Users, label: "Customers" },
   { to: "/admin/tailoring", icon: Scissors, label: "Tailoring" },
   { to: "/admin/coupons", icon: Tag, label: "Coupons" },
+  { to: "/admin/shipping", icon: Truck, label: "Shipping Charges" },
   { to: "/admin/payment", icon: CreditCard, label: "Payment & Banking" },
   { to: "/admin/invoice", icon: FileText, label: "Invoice Settings" },
 ];

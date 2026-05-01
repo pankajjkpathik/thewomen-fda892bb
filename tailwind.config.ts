@@ -64,6 +64,13 @@ export default {
           dark: "hsl(var(--beige-dark))",
         },
         cream: "hsl(var(--cream))",
+        brand: {
+          pink: "hsl(var(--brand-pink))",
+          "pink-soft": "hsl(var(--brand-pink-soft))",
+          dark: "hsl(var(--brand-dark))",
+          "dark-2": "hsl(var(--brand-dark-2))",
+          "dark-foreground": "hsl(var(--brand-dark-foreground))",
+        },
         sidebar: {
           DEFAULT: "hsl(var(--sidebar-background))",
           foreground: "hsl(var(--sidebar-foreground))",

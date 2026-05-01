@@ -14,7 +14,6 @@ const AdminDashboard = () => {
         supabase.from("tailoring_requests").select("id, status"),
         supabase.rpc("admin_list_customers"),
       ]);
-      if (custRes.error) console.error("admin_list_customers error:", custRes.error);
       const paid = (paidRes.data || []).filter((o) => o.payment_status === "paid");
       const pending = (paidRes.data || []).filter((o) => o.payment_status === "pending");
       const tailoringPending = (tailRes.data || []).filter((t) => t.status === "pending").length;

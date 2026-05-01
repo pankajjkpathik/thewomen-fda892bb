@@ -434,6 +434,33 @@ export type Database = {
         }
         Relationships: []
       }
+      shipping_settings: {
+        Row: {
+          default_fee: number
+          enabled: boolean
+          free_shipping_threshold: number
+          id: string
+          notes: string | null
+          updated_at: string
+        }
+        Insert: {
+          default_fee?: number
+          enabled?: boolean
+          free_shipping_threshold?: number
+          id?: string
+          notes?: string | null
+          updated_at?: string
+        }
+        Update: {
+          default_fee?: number
+          enabled?: boolean
+          free_shipping_threshold?: number
+          id?: string
+          notes?: string | null
+          updated_at?: string
+        }
+        Relationships: []
+      }
       tailoring_requests: {
         Row: {
           admin_notes: string | null

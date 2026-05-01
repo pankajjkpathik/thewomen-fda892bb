@@ -4,7 +4,7 @@ import { Search, ShoppingBag, User, Menu, X, LogOut } from "lucide-react";
 import { useCart } from "@/context/CartContext";
 import { useAuth } from "@/hooks/useAuth";
 import { motion, AnimatePresence } from "framer-motion";
-import twLogo from "@/assets/tw-logo.avif";
+import twLogo from "@/assets/tw-logo.png";
 
 const navLinks = [
   { label: "New Arrivals", href: "/shop?filter=new" },
@@ -43,11 +43,8 @@ const Header = () => {
           <Link to="/" aria-label="The Women — Home" className="flex items-center">
             <img
               src={twLogo}
-              alt="The Women"
-              width={115}
-              height={115}
-              className="object-contain"
-              style={{ width: 115, height: 115 }}
+              alt="The Women by Anamika Pathik"
+              className="object-contain h-[105px] w-auto max-w-[340px]"
               loading="eager"
               decoding="async"
             />

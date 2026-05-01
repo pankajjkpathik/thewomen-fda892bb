@@ -29,17 +29,17 @@ const Header = () => {
       </div>
 
       <div className="container mx-auto px-4">
-        <div className="flex items-center justify-between h-[125px]">
+        <div className="relative flex items-center justify-center h-[125px]">
           {/* Mobile menu */}
           <button
             onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-            className="lg:hidden text-foreground"
+            className="lg:hidden text-foreground absolute left-0 top-1/2 -translate-y-1/2"
             aria-label="Toggle menu"
           >
             {mobileMenuOpen ? <X size={24} /> : <Menu size={24} />}
           </button>
 
-          {/* Logo */}
+          {/* Logo (centered) */}
           <Link to="/" aria-label="The Women — Home" className="flex items-center">
             <img
               src={twLogo}
@@ -51,7 +51,7 @@ const Header = () => {
           </Link>
 
           {/* Icons */}
-          <div className="flex items-center gap-4">
+          <div className="flex items-center gap-4 absolute right-0 top-1/2 -translate-y-1/2">
             <button className="hidden sm:block text-foreground hover:text-accent transition-colors" aria-label="Search">
               <Search size={20} />
             </button>

@@ -35,6 +35,20 @@ const AdminOrders = () => {
     else toast.success("Tracking saved");
   };
 
+  const handleInvoice = async (order: any) => {
+    try {
+      const [settings, items] = await Promise.all([fetchInvoiceSettings(), fetchOrderItems(order.id)]);
+      await generateInvoicePDF(order, items, settings);
+    } catch (e: any) { toast.error(e?.message || "Failed to generate invoice"); }
+  };
+
+  const handleLabel = async (order: any) => {
+    try {
+      const settings = await fetchInvoiceSettings();
+      await generateShippingLabelPDF(order, settings);
+    } catch (e: any) { toast.error(e?.message || "Failed to generate label"); }
+  };
+
   return (
     <div>
       <h1 className="font-heading text-2xl lg:text-3xl mb-6">Orders</h1>

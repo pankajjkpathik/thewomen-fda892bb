@@ -29,6 +29,7 @@ import AdminTailoring from "./pages/admin/AdminTailoring";
 import AdminPaymentSettings from "./pages/admin/AdminPaymentSettings";
 import AdminInvoiceSettings from "./pages/admin/AdminInvoiceSettings";
 import AdminCustomers from "./pages/admin/AdminCustomers";
+import AdminShippingSettings from "./pages/admin/AdminShippingSettings";
 
 const queryClient = new QueryClient();
 
@@ -60,6 +61,7 @@ const App = () => (
                 <Route path="coupons" element={<AdminCoupons />} />
                 <Route path="payment" element={<AdminPaymentSettings />} />
                 <Route path="invoice" element={<AdminInvoiceSettings />} />
+                <Route path="shipping" element={<AdminShippingSettings />} />
               </Route>
 
               {/* Auth routes */}

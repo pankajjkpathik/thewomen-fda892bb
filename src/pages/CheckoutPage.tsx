@@ -47,6 +47,29 @@ const CheckoutPage = () => {
   const [couponCode, setCouponCode] = useState("");
   const [coupon, setCoupon] = useState<AppliedCoupon | null>(null);
   const [validating, setValidating] = useState(false);
+  const [shippingConfig, setShippingConfig] = useState<{ default_fee: number; free_shipping_threshold: number; enabled: boolean }>({
+    default_fee: 99,
+    free_shipping_threshold: 1999,
+    enabled: true,
+  });
+
+  useEffect(() => {
+    supabase
+      .from("shipping_settings")
+      .select("default_fee, free_shipping_threshold, enabled")
+      .order("updated_at", { ascending: false })
+      .limit(1)
+      .maybeSingle()
+      .then(({ data }) => {
+        if (data) {
+          setShippingConfig({
+            default_fee: Number(data.default_fee),
+            free_shipping_threshold: Number(data.free_shipping_threshold),
+            enabled: data.enabled,
+          });
+        }
+      });
+  }, []);
 
   useEffect(() => {
     if (!authLoading && !user) {
@@ -115,7 +138,11 @@ const CheckoutPage = () => {
     setCouponCode("");
   };
 
-  const shippingFee = totalPrice >= 1999 ? 0 : 99;
+  const shippingFee = !shippingConfig.enabled
+    ? 0
+    : shippingConfig.free_shipping_threshold > 0 && totalPrice >= shippingConfig.free_shipping_threshold
+    ? 0
+    : shippingConfig.default_fee;
   const discountAmount = coupon?.discount_amount || 0;
   const grandTotal = Math.max(0, totalPrice - discountAmount + shippingFee);
 

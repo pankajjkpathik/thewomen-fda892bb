@@ -1,11 +1,20 @@
 import { Link } from "react-router-dom";
+import twLogo from "@/assets/tw-logo.png";
 
 const Footer = () => (
   <footer className="bg-primary text-primary-foreground">
     <div className="container mx-auto px-4 py-16">
       <div className="grid grid-cols-1 md:grid-cols-4 gap-10">
         <div>
-          <h3 className="font-heading text-2xl mb-4">THE WOMEN</h3>
+          <div className="bg-background rounded-md p-3 inline-block mb-4">
+            <img
+              src={twLogo}
+              alt="The Women by Anamika Pathik"
+              className="h-16 w-auto object-contain"
+              loading="lazy"
+              decoding="async"
+            />
+          </div>
           <p className="font-body text-sm opacity-80 leading-relaxed">
             Premium Indian ethnic wear crafted with love. Celebrating the grace, beauty, and strength of every woman.
           </p>

@@ -83,8 +83,8 @@ const Footer = () => (
             <a href="mailto:support@thewomens.online" className="hover:opacity-100 transition-opacity inline-flex items-center gap-2">
               <Mail size={14} /> support@thewomens.online
             </a>
-            <a href="tel:+919999999999" className="hover:opacity-100 transition-opacity inline-flex items-center gap-2">
-              <Phone size={14} /> +91 99999 99999
+            <a href="tel:+919418269600" className="hover:opacity-100 transition-opacity inline-flex items-center gap-2">
+              <Phone size={14} /> +91 94182 69600
             </a>
           </div>
         </div>

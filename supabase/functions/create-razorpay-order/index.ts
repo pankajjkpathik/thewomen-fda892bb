@@ -47,7 +47,22 @@ Deno.serve(async (req) => {
       }
     }
 
-    const shipping_amount = subtotal >= 1999 ? 0 : 99;
+    // Server-side shipping calculation from admin settings
+    let shipping_amount = 0;
+    {
+      const { data: ship } = await supabase
+        .from("shipping_settings")
+        .select("default_fee, free_shipping_threshold, enabled")
+        .order("updated_at", { ascending: false })
+        .limit(1)
+        .maybeSingle();
+      const fee = Number(ship?.default_fee ?? 99);
+      const threshold = Number(ship?.free_shipping_threshold ?? 1999);
+      const enabled = ship?.enabled ?? true;
+      if (!enabled) shipping_amount = 0;
+      else if (threshold > 0 && subtotal >= threshold) shipping_amount = 0;
+      else shipping_amount = fee;
+    }
     const total = Math.max(0, Math.round((subtotal - discountAmount + shipping_amount) * 100) / 100);
     const amountPaise = Math.round(total * 100);
 

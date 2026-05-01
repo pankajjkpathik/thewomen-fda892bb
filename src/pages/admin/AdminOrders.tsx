@@ -2,7 +2,10 @@ import { useState } from "react";
 import { useAdminOrders } from "@/hooks/useAdmin";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Input } from "@/components/ui/input";
+import { Button } from "@/components/ui/button";
+import { FileText, Package } from "lucide-react";
 import { toast } from "sonner";
+import { fetchInvoiceSettings, fetchOrderItems, generateInvoicePDF, generateShippingLabelPDF } from "@/lib/documents";
 
 const statusColors: Record<string, string> = {
   pending: "bg-yellow-100 text-yellow-800",

@@ -83,6 +83,12 @@ const AdminOrders = () => {
                       ))}
                     </SelectContent>
                   </Select>
+                  <Button variant="outline" size="sm" onClick={() => handleInvoice(order)} className="gap-1">
+                    <FileText size={14} /> Invoice
+                  </Button>
+                  <Button variant="outline" size="sm" onClick={() => handleLabel(order)} className="gap-1">
+                    <Package size={14} /> Label
+                  </Button>
                 </div>
               </div>
 

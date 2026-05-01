@@ -2,7 +2,10 @@ import { useState } from "react";
 import { useAdminOrders } from "@/hooks/useAdmin";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Input } from "@/components/ui/input";
+import { Button } from "@/components/ui/button";
+import { FileText, Package } from "lucide-react";
 import { toast } from "sonner";
+import { fetchInvoiceSettings, fetchOrderItems, generateInvoicePDF, generateShippingLabelPDF } from "@/lib/documents";
 
 const statusColors: Record<string, string> = {
   pending: "bg-yellow-100 text-yellow-800",
@@ -30,6 +33,20 @@ const AdminOrders = () => {
     const error = await updateTrackingId(id, tid, turl);
     if (error) toast.error(error.message);
     else toast.success("Tracking saved");
+  };
+
+  const handleInvoice = async (order: any) => {
+    try {
+      const [settings, items] = await Promise.all([fetchInvoiceSettings(), fetchOrderItems(order.id)]);
+      await generateInvoicePDF(order, items, settings);
+    } catch (e: any) { toast.error(e?.message || "Failed to generate invoice"); }
+  };
+
+  const handleLabel = async (order: any) => {
+    try {
+      const settings = await fetchInvoiceSettings();
+      await generateShippingLabelPDF(order, settings);
+    } catch (e: any) { toast.error(e?.message || "Failed to generate label"); }
   };
 
   return (
@@ -66,6 +83,12 @@ const AdminOrders = () => {
                       ))}
                     </SelectContent>
                   </Select>
+                  <Button variant="outline" size="sm" onClick={() => handleInvoice(order)} className="gap-1">
+                    <FileText size={14} /> Invoice
+                  </Button>
+                  <Button variant="outline" size="sm" onClick={() => handleLabel(order)} className="gap-1">
+                    <Package size={14} /> Label
+                  </Button>
                 </div>
               </div>
 

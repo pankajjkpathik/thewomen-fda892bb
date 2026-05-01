@@ -32,6 +32,16 @@ const AdminInvoiceSettings = () => {
     else toast({ title: "Invoice settings saved" });
   };
 
+  const uploadLogo = async (file: File) => {
+    const ext = file.name.split(".").pop();
+    const path = `invoice-logo-${Date.now()}.${ext}`;
+    const { error: upErr } = await supabase.storage.from("product-images").upload(path, file, { upsert: true });
+    if (upErr) { toast({ title: "Upload failed", description: upErr.message, variant: "destructive" }); return; }
+    const { data } = supabase.storage.from("product-images").getPublicUrl(path);
+    set("logo_url", data.publicUrl);
+    toast({ title: "Logo uploaded — click Save to persist" });
+  };
+
   if (loading) return <p className="font-body text-muted-foreground">Loading…</p>;
 
   return (
@@ -40,7 +50,22 @@ const AdminInvoiceSettings = () => {
       <p className="font-body text-sm text-muted-foreground mb-6">Business details used on invoices, receipts and customer-facing documents.</p>
 
       <div className="bg-card border border-border rounded-lg p-6 space-y-5 font-body">
-        <h2 className="font-heading text-xl">Business identity</h2>
+        <h2 className="font-heading text-xl">Logo</h2>
+        <div className="flex items-center gap-4">
+          {row?.logo_url ? (
+            <img src={row.logo_url} alt="Logo" className="h-20 w-20 object-contain border border-border rounded bg-muted" />
+          ) : (
+            <div className="h-20 w-20 border border-dashed border-border rounded flex items-center justify-center text-xs text-muted-foreground">No logo</div>
+          )}
+          <div className="flex flex-col gap-2">
+            <Input type="file" accept="image/*" onChange={(e) => e.target.files?.[0] && uploadLogo(e.target.files[0])} />
+            {row?.logo_url && (
+              <Button variant="outline" size="sm" onClick={() => set("logo_url", null)}>Remove logo</Button>
+            )}
+          </div>
+        </div>
+
+        <h2 className="font-heading text-xl pt-4 border-t border-border">Business identity</h2>
         <div className="grid grid-cols-2 gap-4">
           <div><Label>Business name (display)</Label><Input value={row?.business_name || ""} onChange={(e) => set("business_name", e.target.value)} /></div>
           <div><Label>Legal name</Label><Input value={row?.legal_name || ""} onChange={(e) => set("legal_name", e.target.value)} /></div>
